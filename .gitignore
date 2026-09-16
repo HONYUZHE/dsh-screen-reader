@@ -1,0 +1,10 @@
+# node_modules 在 DSHA 里是指向 dsh 运行时的一层软链（peer 依赖由 DSH 提供），
+# 千万不要提交进仓库。
+# 注意不能写成 `node_modules/`：带斜杠只匹配目录，而这里是个**符号链接**，
+# 对 git 来说是文件，会被漏放进来。
+node_modules
+
+# 本地跑测试留下的东西
+*.log
+.DS_Store
+*.dsha-tmp

@@ -1,0 +1,13 @@
+# DSHA 实时读屏插件的 bundle patch：把它挂进 web profile 的插件树。
+#
+# 需要改配置时，不要改这里 —— 在 $DSH_HOME/profiles/web/cordis.patch.yml 里按
+# id 覆盖，例如：
+#
+#   - id: screen-reader
+#     config:
+#       prompt: false
+#       actionSettleMs: 250
+#
+- insert:
+    - id: screen-reader
+      name: 'dsh-screen-reader'

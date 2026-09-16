@@ -1,0 +1,68 @@
+{
+  "name": "dsh-screen-reader",
+  "version": "0.1.0",
+  "description": "DSH/DSHA 插件：让 DeepSeek-v4 系列模型毫秒级、低 token 成本地实时读取 Android 屏幕（无障碍树 + 增量差分 + 按需截图），并支持「动作后直接回读」。",
+  "keywords": [
+    "dsh",
+    "dsha",
+    "deepseek-harness",
+    "cordis-plugin",
+    "android",
+    "accessibility",
+    "screen-reader",
+    "agent",
+    "vision",
+    "tools"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "test",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test/reader-unit.mjs",
+    "test:unit": "node test/reader-unit.mjs",
+    "test:device": "node test/smoke.mjs",
+    "test:load": "node test/plugin-load.mjs",
+    "test:all": "node test/reader-unit.mjs && node test/plugin-load.mjs && node test/smoke.mjs"
+  },
+  "cordis": {
+    "entry": "lib/index.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.0",
+    "@deepseek-ai/dsh-tools": ">=0.0.1-rc.1",
+    "@deepseek-ai/schemastery": ">=3.18.0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HONYUZHE/dsh-screen-reader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HONYUZHE/dsh-screen-reader/issues"
+  },
+  "homepage": "https://github.com/HONYUZHE/dsh-screen-reader#readme",
+  "author": "HONYUZHE",
+  "license": "MIT"
+}
