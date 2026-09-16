@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit:
+    name: 单元测试 (node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['20', '22', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      # 不需要 npm install：lib/tree.js 与 lib/bridge.js 只依赖 node 内置模块，
+      # 所以纯逻辑测试可以在裸机上跑。需要设备/DSH 运行时的 smoke 与 plugin-load
+      # 不在这里跑（见 README 的测试矩阵）。
+      - run: node test/reader-unit.mjs
+
+  syntax:
+    name: 语法检查
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: |
+          for f in lib/*.js test/*.mjs; do
+            node --check "$f" || exit 1
+          done

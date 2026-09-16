@@ -1,5 +1,6 @@
 # dsh-screen-reader
 
+![CI](https://github.com/HONYUZHE/dsh-screen-reader/actions/workflows/ci.yml/badge.svg)
 ![license](https://img.shields.io/badge/license-MIT-blue.svg)
 ![node](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)
 ![platform](https://img.shields.io/badge/platform-Android%20%C2%B7%20DSH-lightgrey.svg)
