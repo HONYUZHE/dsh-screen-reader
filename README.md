@@ -10,6 +10,10 @@
 读一屏 **10 毫秒级**；全量输出比原始无障碍树**省 61% token**，增量输出只要**约 30 token**；
 「点一下再看结果」从三次工具调用压成**一次**。
 
+> 配套插件：[`dsh-screen-flow`](https://github.com/HONYUZHE/dsh-screen-flow) —— 本插件负责**看见**，
+> 它负责**等到位**（等某段文字出现/消失、等画面稳定）并把一串「等 → 点 → 等」合成一次调用。
+> 两个插件各自独立，可以只装一个。
+
 > **English** — A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) plugin that gives
 > vision-capable models real-time access to an Android screen. It reads the accessibility tree over the
 > DSHA bridge (`127.0.0.1:3090`) in ~10 ms, returns **deltas** by default (≈30 tokens instead of ≈4100),
@@ -225,6 +229,9 @@ node test/smoke.mjs --with-ui    # 额外跑「下拉通知栏 → 复原」验�
 
 - **读屏/截屏被拒**（`[ERR] 你拒绝了这次屏幕读取`）：这是 App 侧的授权决定，
   插件会原样转告用户去「设置 → 设备能力授权」，**不重试、不绕道**。
+- **无障碍服务被关掉**（`[ERR] 无障碍服务未开启…`）：单独归类为 `A11Y_OFF`，提示用户去
+  DSHA「配置」页点「屏幕操作权限」。**不要把它当成锁屏** —— 给「先按 home」的建议会把人带偏，
+  而且这种情况重试也不会自己好。
 - **锁屏 / 系统弹窗**：桥会回 `[ERR] 取不到当前窗口`，插件给出「先按 home 调回界面」的建议。
 - **三种瞬时态**（实测都出现过，都会自愈，插件自动重试 ≤ `maxAttempts` 次）：
   1. `BRIDGE_TIMEOUT` —— App 的 Activity 刚切换时第一次 dump 可能几秒不返回；

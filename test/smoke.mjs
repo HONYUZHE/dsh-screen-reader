@@ -210,14 +210,20 @@ async function main() {
   }
 
   section('错误分类')
-  // 回归用例：屏幕正文里出现「你拒绝了这次屏幕读取」时，绝不能把成功的 dump 判成拒绝。
-  const longDump = `窗口应用: com.dsh.client\n[1] "讨论：[ERR] 你拒绝了这次屏幕读取 是什么意思" 中心=(10,10) 区域=0,0,20,20`
-  check('正文含同名单词不误判', bridge.classifyResult(longDump) === undefined,
+  // 回归用例：屏幕正文里出现错误句子时，绝不能把成功的 dump 判成故障。
+  const longDump = [
+    '窗口应用: com.dsh.client',
+    '[1] "讨论：[ERR] 你拒绝了这次屏幕读取 是什么意思" 中心=(10,10) 区域=0,0,20,20',
+    '[2] "还有 无障碍服务未开启 这个提示" 中心=(20,20) 区域=0,0,30,30',
+  ].join('\n')
+  check('正文含同名字词不误判', bridge.classifyResult(longDump) === undefined,
     String(bridge.classifyResult(longDump)?.code))
   check('真正的拒绝被识别', bridge.classifyResult('[ERR] 你拒绝了这次屏幕读取')?.code === 'SCREEN_DENIED')
   check('截屏拒绝被识别', bridge.classifyResult('[ERR] 你拒绝了这次截屏')?.code === 'SCREEN_DENIED')
   check('越权被识别', bridge.classifyResult('[UNAUTHORIZED]')?.code === 'UNAUTHORIZED')
   check('锁屏读不到被识别', bridge.classifyResult('[ERR] 取不到当前窗口（可能停在锁屏或系统弹窗上）')?.code === 'ERR')
+  // 无障碍被关掉跟「锁屏读不到」是两回事：该去的地方不同，提示也不能是「先按 home」。
+  check('无障碍没开单独归类', bridge.classifyResult('[ERR] 无障碍服务未开启。请让用户在 DSHA「配置」页点「屏幕操作权限」')?.code === 'A11Y_OFF')
   try {
     await bridge.bridgeCall('/app/definitely-not-an-endpoint')
     check('未知端点被识别', false, '没有报错')
