@@ -169,5 +169,33 @@ console.log('\n=== 截屏路径兜底 ===')
   check('都读不到时给出可诊断信息', message.includes('试过') && message.includes('ENOENT'), message.slice(0, 70))
 }
 
+console.log('\n=== 错误提示必须带上「该去哪开」 ===')
+{
+  // 工具层只把 message 交给模型，hint 会被丢掉。所以 read() 必须把 hint 并进 message，
+  // 否则模型只看到「你拒绝了这次屏幕读取」，不知道该怎么办，就会去瞎重试。
+  const hint = '读屏授权被拒。这是用户的决定，不要重试 —— 让用户去「设置 → 设备能力授权」允许屏幕读取。'
+  const fake = scriptedDump([() => { throw new BridgeError('[ERR] 你拒绝了这次屏幕读取', 'SCREEN_DENIED', hint) }])
+  const reader = new ScreenReader(CONFIG, { dump: fake })
+  let caught
+  try {
+    await reader.read({ force: true })
+  } catch (error) {
+    caught = error
+  }
+  check('错误消息里带上了下一步建议', caught?.message?.includes('设备能力授权'), String(caught?.message).slice(0, 50))
+  check('桥的原话没丢', caught?.message?.includes('你拒绝了这次屏幕读取'))
+  check('错误码保留', caught?.code === 'SCREEN_DENIED', String(caught?.code))
+
+  // 没有 hint 时不改动消息
+  const plain = scriptedDump([() => { throw new BridgeError('普通失败', 'X', '') }])
+  let plainCaught
+  try {
+    await new ScreenReader(CONFIG, { dump: plain }).read({ force: true })
+  } catch (error) {
+    plainCaught = error
+  }
+  check('没有建议时消息保持原样', plainCaught?.message === '普通失败', String(plainCaught?.message))
+}
+
 console.log(`\n=== 结果：${checks - failures}/${checks} 通过 ===`)
 if (failures > 0) process.exitCode = 1
